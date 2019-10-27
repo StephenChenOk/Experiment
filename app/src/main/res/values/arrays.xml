@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+   <string-array name="titles">
+       <item>Is Tomato a Vegetable or a Fruit?</item>
+       <item>Is Tomato a Vegetable or a Fruit?</item>
+       <item>Is Tomato a Vegetable or a Fruit?</item>
+       <item>Is Tomato a Vegetable or a Fruit?</item>
+       <item>Is Tomato a Vegetable or a Fruit?</item>
+       <item>Is Tomato a Vegetable or a Fruit?</item>
+       <item>Is Tomato a Vegetable or a Fruit?</item>
+       <item>Is Tomato a Vegetable or a Fruit?</item>
+       <item>Is Tomato a Vegetable or a Fruit?</item>
+       <item>Is Tomato a Vegetable or a Fruit?</item>
+   </string-array>
+
+    <string-array name="authors">
+        <item>Chitra Padmanabhan</item>
+        <item>Chitra Padmanabhan</item>
+        <item>Chitra Padmanabhan</item>
+        <item>Chitra Padmanabhan</item>
+        <item>Chitra Padmanabhan</item>
+        <item>Chitra Padmanabhan</item>
+        <item>Chitra Padmanabhan</item>
+        <item>Chitra Padmanabhan</item>
+        <item>Chitra Padmanabhan</item>
+        <item>Chitra Padmanabhan</item>
+    </string-array>
+
+    <string-array name="images">
+        <item>@drawable/image_01</item>
+        <item>@drawable/image_01</item>
+        <item>@drawable/image_01</item>
+        <item>@drawable/image_01</item>
+        <item>@drawable/image_01</item>
+        <item>@drawable/image_01</item>
+        <item>@drawable/image_01</item>
+        <item>@drawable/image_01</item>
+        <item>@drawable/image_01</item>
+        <item>@drawable/image_01</item>
+    </string-array>
+
+</resources>
