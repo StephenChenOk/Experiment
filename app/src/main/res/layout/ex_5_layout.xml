@@ -6,7 +6,7 @@
     android:orientation="vertical">
 
     <Button
-        android:id="@+id/btnShowToast"
+        android:id="@+id/btnShowToast_ex5"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
@@ -14,7 +14,7 @@
         android:textColor="@android:color/white" />
 
     <TextView
-        android:id="@+id/tvCounter"
+        android:id="@+id/tvCounter_ex5"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
@@ -24,7 +24,7 @@
         android:textSize="160dp" />
 
     <Button
-        android:id="@+id/btnCount"
+        android:id="@+id/btnCount_ex5"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"

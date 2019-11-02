@@ -9,7 +9,7 @@
         android:roundIcon="@mipmap/ic_dog_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ex_7.NewsActivity"
+        <activity android:name=".ex_9.NewsActivity"
             android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -18,10 +18,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".ExTwoActivity"/>
-        <activity android:name=".ex_4.OneActivity"/>
         <activity android:name=".ex_4.TwoActivity"/>
         <activity android:name=".ex_4.MessageActivity"/>
-        <activity android:name=".ex_5.OneActivity"/>
+        <activity android:name=".ex_7.NewsContentActivity"/>
     </application>
 
 </manifest>

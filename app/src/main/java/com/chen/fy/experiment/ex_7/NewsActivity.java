@@ -1,19 +1,19 @@
 package com.chen.fy.experiment.ex_7;
 
+import android.content.Intent;
 import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
 import com.chen.fy.experiment.R;
 
-import org.w3c.dom.ls.LSException;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -21,6 +21,7 @@ public class NewsActivity extends AppCompatActivity {
 
     private String[] titles = null;
     private String[] authors = null;
+    private String[] content = null;
 
     private static final String NEWS_TITLE = "news_title";
     private static final String NEWS_AUTHOR = "news_author";
@@ -39,12 +40,22 @@ public class NewsActivity extends AppCompatActivity {
 
         ListView listView = findViewById(R.id.lv_news_list);
         listView.setAdapter(getNewsAdapter());
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent =new Intent(NewsActivity.this, NewsContentActivity.class);
+                intent.putExtra("newsContent",newsList.get(position).getContent());
+                startActivity(intent);
+            }
+        });
     }
 
     private void initData() {
         int length;
         titles = getResources().getStringArray(R.array.titles);
         authors = getResources().getStringArray(R.array.authors);
+        content = getResources().getStringArray(R.array.content);
+
         TypedArray images = getResources().obtainTypedArray(R.array.images);
 
         if (titles.length > authors.length) {
@@ -57,6 +68,7 @@ public class NewsActivity extends AppCompatActivity {
            News news = new News();
            news.setTitle(titles[i]);
            news.setAuthor(authors[i]);
+           news.setContent(content[i]);
            news.setImageId(images.getResourceId(i,0));
 
            newsList.add(news);

@@ -8,7 +8,7 @@
     tools:context=".MainActivity">
 
     <EditText
-        android:id="@+id/etMessage"
+        android:id="@+id/etMessage_ex4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
@@ -19,13 +19,13 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/btnSend"
+        android:id="@+id/btnSend_ex4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="30dp"
         android:layout_marginTop="10dp"
         android:text="send"
-        app:layout_constraintLeft_toRightOf="@id/etMessage"
+        app:layout_constraintLeft_toRightOf="@id/etMessage_ex4"
         app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

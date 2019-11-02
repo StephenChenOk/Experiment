@@ -1,9 +1,9 @@
 package com.chen.fy.experiment.ex_5;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -21,7 +21,7 @@ public class OneActivity extends AppCompatActivity implements View.OnClickListen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.counter_layout);
+        setContentView(R.layout.ex_5_layout);
 
         initView();
     }
@@ -30,9 +30,9 @@ public class OneActivity extends AppCompatActivity implements View.OnClickListen
      * 活动遭到异常销毁后执行的方法，可以在里面保存一些必要的信息
      */
     @Override
-    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+    protected void onSaveInstanceState(Bundle outState) {
         outState.putInt(COUNT_VALUE,count);  //保存数值
-        super.onSaveInstanceState(outState, outPersistentState);
+        super.onSaveInstanceState(outState);
     }
 
     /**
@@ -43,14 +43,15 @@ public class OneActivity extends AppCompatActivity implements View.OnClickListen
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         count = savedInstanceState.getInt(COUNT_VALUE);
-        tvCounter.setText(Integer.toString(count));
+        if(tvCounter!=null) {
+            tvCounter.setText(Integer.toString(count));
+        }
     }
-
     private void initView(){
 
-        Button btnCounter = findViewById(R.id.btnCount);
-        Button btnShowToast = findViewById(R.id.btnShowToast);
-        tvCounter = findViewById(R.id.tvCounter);
+        Button btnCounter = findViewById(R.id.btnCount_ex5);
+        Button btnShowToast = findViewById(R.id.btnShowToast_ex5);
+        tvCounter = findViewById(R.id.tvCounter_ex5);
 
         btnCounter.setOnClickListener(this);
         btnShowToast.setOnClickListener(this);
@@ -59,14 +60,13 @@ public class OneActivity extends AppCompatActivity implements View.OnClickListen
     @Override
     public void onClick(View v) {
         switch (v.getId()){
-            case R.id.btnShowToast:
-                Toast.makeText(this,"Hello World!",Toast.LENGTH_SHORT).show();
+            case R.id.btnShowToast_ex5:
+                Toast.makeText(this,"Show!",Toast.LENGTH_SHORT).show();
                 break;
 
-            case R.id.btnCount:
+            case R.id.btnCount_ex5:
                 tvCounter.setText(Integer.toString(++count));
                 break;
         }
     }
-
 }

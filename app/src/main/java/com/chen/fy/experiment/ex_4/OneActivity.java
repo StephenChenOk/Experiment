@@ -22,8 +22,8 @@ public class OneActivity extends AppCompatActivity implements View.OnClickListen
     }
     private void initView(){
 
-        Button btnSend = findViewById(R.id.btnCount);
-        etMessage = findViewById(R.id.etMessage);
+        Button btnSend = findViewById(R.id.btnSend_ex4);
+        etMessage = findViewById(R.id.etMessage_ex4);
 
         btnSend.setOnClickListener(this);
     }
@@ -31,13 +31,13 @@ public class OneActivity extends AppCompatActivity implements View.OnClickListen
     @Override
     public void onClick(View v) {
         switch (v.getId()){
-            case R.id.btnSend:
+            case R.id.btnSend_ex4:
                 String message = etMessage.getText().toString();
                 Intent intent = new Intent(this,MessageActivity.class);
                 intent.putExtra("message",message);
+                startActivity(intent);
                 break;
 
         }
     }
-
 }

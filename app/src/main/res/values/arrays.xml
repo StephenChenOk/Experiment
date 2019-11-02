@@ -2,42 +2,43 @@
 <resources>
 
    <string-array name="titles">
-       <item>Is Tomato a Vegetable or a Fruit?</item>
-       <item>Is Tomato a Vegetable or a Fruit?</item>
-       <item>Is Tomato a Vegetable or a Fruit?</item>
-       <item>Is Tomato a Vegetable or a Fruit?</item>
-       <item>Is Tomato a Vegetable or a Fruit?</item>
-       <item>Is Tomato a Vegetable or a Fruit?</item>
-       <item>Is Tomato a Vegetable or a Fruit?</item>
-       <item>Is Tomato a Vegetable or a Fruit?</item>
-       <item>Is Tomato a Vegetable or a Fruit?</item>
-       <item>Is Tomato a Vegetable or a Fruit?</item>
+       <item>解放碑步行街</item>
+       <item>长江索道</item>
+       <item>南京路步行街</item>
+       <item>白帝城景区</item>
+       <item>武隆天生三桥</item>
+       <item>磁器口古镇</item>
+       <item>上海长风海洋世界</item>
    </string-array>
 
     <string-array name="authors">
-        <item>Chitra Padmanabhan</item>
-        <item>Chitra Padmanabhan</item>
-        <item>Chitra Padmanabhan</item>
-        <item>Chitra Padmanabhan</item>
-        <item>Chitra Padmanabhan</item>
-        <item>Chitra Padmanabhan</item>
-        <item>Chitra Padmanabhan</item>
-        <item>Chitra Padmanabhan</item>
-        <item>Chitra Padmanabhan</item>
-        <item>Chitra Padmanabhan</item>
+        <item>重庆市渝中区解放碑周边区域</item>
+        <item>重庆市渝中区新华路151号</item>
+        <item>上海市黄浦区河南中路</item>
+        <item>奉节县夔门街道办事处瞿塘峡社区白帝城景区</item>
+        <item>重庆市武隆区仙女山镇游客接待中心</item>
+        <item>重庆市沙坪坝区磁器口古镇</item>
+        <item>普陀区大渡河路451号（长风公园4号门）</item>
+    </string-array>
+
+    <string-array name="content">
+        <item>新闻内容1</item>
+        <item>新闻内容2</item>
+        <item>新闻内容3</item>
+        <item>新闻内容4</item>
+        <item>新闻内容5</item>
+        <item>新闻内容6</item>
+        <item>新闻内容7</item>
     </string-array>
 
     <string-array name="images">
         <item>@drawable/image_01</item>
-        <item>@drawable/image_01</item>
-        <item>@drawable/image_01</item>
-        <item>@drawable/image_01</item>
-        <item>@drawable/image_01</item>
-        <item>@drawable/image_01</item>
-        <item>@drawable/image_01</item>
-        <item>@drawable/image_01</item>
-        <item>@drawable/image_01</item>
-        <item>@drawable/image_01</item>
+        <item>@drawable/image_02</item>
+        <item>@drawable/image_03</item>
+        <item>@drawable/image_04</item>
+        <item>@drawable/image_05</item>
+        <item>@drawable/image_06</item>
+        <item>@drawable/image_07</item>
     </string-array>
 
 </resources>
