@@ -75,6 +75,8 @@ public class NewsActivity extends AppCompatActivity {
         }
     }
 
+
+
     private NewsAdapter getNewsAdapter() {
         return new NewsAdapter(this, R.layout.ex7_news_list_item3, newsList);
     }

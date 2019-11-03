@@ -7,13 +7,13 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.CursorLoader;
 
 /**
- * 在后台对数据库进行操作
+ * 在子线程中对数据库进行操作，避免UI阻塞等的卡顿现象
  */
 public class NewsQueryAsyncCursorLoader extends CursorLoader {
 
     private Context mContext;
 
-    public NewsQueryAsyncCursorLoader(@NonNull Context context) {
+    NewsQueryAsyncCursorLoader(@NonNull Context context) {
         super(context);
         mContext = context;
     }

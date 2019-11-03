@@ -37,9 +37,9 @@ public class NewsAdapter extends ArrayAdapter {
         if (convertView == null) {      //判断缓冲池是否已经有view ,若有则可以直接用,不需要再继续反射
             view = LayoutInflater.from(getContext()).inflate(mResourceId, parent, false);
             viewHolder = new ViewHolder();
-            viewHolder.tvTitle = view.findViewById(R.id.tv_item3_title);
-            viewHolder.tvAuthor = view.findViewById(R.id.tv_item3_subtitle);
-            viewHolder.imageView = view.findViewById(R.id.iv_item3_image);
+            viewHolder.tvTitle = view.findViewById(R.id.tv_item_ex7_title);
+            viewHolder.tvAuthor = view.findViewById(R.id.tv_item_ex7_author);
+            viewHolder.imageView = view.findViewById(R.id.iv_item_ex7_image);
 
             view.setTag(viewHolder);
         } else {    //若缓冲池中已经有view则可以直接用holder对象

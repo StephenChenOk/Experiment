@@ -17,18 +17,18 @@
             android:layout_height="wrap_content">
 
             <ImageView
-                android:id="@+id/iv_item3_image"
+                android:id="@+id/iv_item_ex7_image"
                 android:layout_width="match_parent"
                 android:layout_height="150dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/image_01" />
 
             <TextView
-                android:id="@+id/tv_item3_title"
+                android:id="@+id/tv_item_ex7_title"
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/iv_item3_image"
+                android:layout_below="@+id/iv_item_ex7_image"
                 android:paddingLeft="8dp"
                 android:paddingTop="8dp"
                 android:paddingBottom="4dp"
@@ -38,14 +38,14 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/tv_item3_subtitle"
+                android:id="@+id/tv_item_ex7_author"
                 style="@style/TextAppearance.AppCompat.Subhead"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/tv_item3_title"
+                android:layout_below="@+id/tv_item_ex7_title"
                 android:paddingLeft="8dp"
                 android:paddingBottom="4dp"
-                android:text="Subtitle"
+                android:text="Author"
                 android:textColor="@android:color/secondary_text_light" />
 
         </RelativeLayout>
