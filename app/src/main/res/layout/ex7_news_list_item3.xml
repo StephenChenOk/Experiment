@@ -48,6 +48,17 @@
                 android:text="Author"
                 android:textColor="@android:color/secondary_text_light" />
 
+            <ImageView
+                android:id="@+id/iv_delete_ex7"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tv_item_ex7_title"
+                android:layout_alignParentRight="true"
+                android:clickable="true"
+                android:paddingRight="8dp"
+                android:paddingBottom="8dp"
+                android:src="@drawable/ic_close_24dp" />
+
         </RelativeLayout>
 
     </android.support.v7.widget.CardView>

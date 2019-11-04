@@ -4,24 +4,33 @@ import android.content.Intent;
 import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.Toast;
 
 import com.chen.fy.experiment.R;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 public class NewsActivity extends AppCompatActivity {
 
-    private String[] titles = null;
-    private String[] authors = null;
-    private String[] content = null;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+
+    private NewsAdapter mNewsAdapter;
+
+    private String[] mTitles;
+    private String[] mAuthors;
+    private String[] mContent;
+    private TypedArray mImages;
 
     private static final String NEWS_TITLE = "news_title";
     private static final String NEWS_AUTHOR = "news_author";
@@ -38,8 +47,30 @@ public class NewsActivity extends AppCompatActivity {
 
         initData();
 
+        mSwipeRefreshLayout = findViewById(R.id.swipe_refresh);
+        mSwipeRefreshLayout.setOnRefreshListener(
+                new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        refreshData();
+                        mSwipeRefreshLayout.setRefreshing(false); //取消刷新动作并隐藏控件
+                    }
+                }
+        );
+
         ListView listView = findViewById(R.id.lv_news_list);
-        listView.setAdapter(getNewsAdapter());
+
+        mNewsAdapter = new NewsAdapter(this, R.layout.ex7_news_list_item3, newsList);
+
+        mNewsAdapter.setOnItemDeleteListener(new NewsAdapter.OnItemDeleteListener() {
+            @Override
+            public void onDelete(int itemId) {
+                Toast.makeText(NewsActivity.this,"删除Item...",Toast.LENGTH_LONG).show();
+                removeData(itemId);   //回调删除Item
+            }
+        });
+
+        listView.setAdapter(mNewsAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -48,37 +79,68 @@ public class NewsActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        FloatingActionButton fab = findViewById(R.id.fab_add_ex7);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(NewsActivity.this,"添加一条记录...",Toast.LENGTH_LONG).show();
+                refreshData();
+            }
+        });
     }
 
+    /**
+     * 删除Item
+     */
+    private void removeData(int id) {
+        newsList.remove(id);
+        mNewsAdapter.notifyDataSetChanged();
+    }
+
+    /**
+     * 初始化数据
+     */
     private void initData() {
         int length;
-        titles = getResources().getStringArray(R.array.titles);
-        authors = getResources().getStringArray(R.array.authors);
-        content = getResources().getStringArray(R.array.content);
+        mTitles = getResources().getStringArray(R.array.titles);
+        mAuthors = getResources().getStringArray(R.array.authors);
+        mContent = getResources().getStringArray(R.array.content);
 
-        TypedArray images = getResources().obtainTypedArray(R.array.images);
+        mImages = getResources().obtainTypedArray(R.array.images);
 
-        if (titles.length > authors.length) {
-            length = authors.length;
+        if (mTitles.length > mAuthors.length) {
+            length = mAuthors.length;
         } else {
-            length = titles.length;
+            length = mTitles.length;
         }
 
         for (int i = 0; i < length; i++) {
            News news = new News();
-           news.setTitle(titles[i]);
-           news.setAuthor(authors[i]);
-           news.setContent(content[i]);
-           news.setImageId(images.getResourceId(i,0));
+           news.setTitle(mTitles[i]);
+           news.setAuthor(mAuthors[i]);
+           news.setContent(mContent[i]);
+           news.setImageId(mImages.getResourceId(i,0));
 
            newsList.add(news);
         }
     }
 
+    /**
+     * 刷新界面，新增一条item记录
+     */
+    private void refreshData() {
+        Random random = new Random();
+        int index = random.nextInt(7);
 
+        News news = new News();
+        news.setTitle(mTitles[index]);
+        news.setAuthor(mAuthors[index]);
+        news.setContent(mContent[index]);
+        news.setImageId(mImages.getResourceId(index, -1));
 
-    private NewsAdapter getNewsAdapter() {
-        return new NewsAdapter(this, R.layout.ex7_news_list_item3, newsList);
+        mNewsAdapter.insert(news,0);        //插入数据
+        mNewsAdapter.notifyDataSetChanged();      //通知Adapter数据发生更新，进行重绘ItemView
     }
 
     private SimpleAdapter getSimpleAdapter() {
@@ -95,6 +157,6 @@ public class NewsActivity extends AppCompatActivity {
      */
     private ArrayAdapter getArrayAdapter() {
         return new ArrayAdapter<String>(
-                this, R.layout.lv_news_list_item, R.id.tv_news_item, titles);
+                this, R.layout.lv_news_list_item, R.id.tv_news_item, mTitles);
     }
 }

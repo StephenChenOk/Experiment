@@ -21,6 +21,9 @@ public class NewsAdapter extends ArrayAdapter {
     private int mResourceId;
     private List<News> mNewsData;
 
+    private OnItemDeleteListener listener = null;
+
+
     public NewsAdapter(@NonNull Context context, int resourceId, @NonNull List<News> newsData) {
         super(context, resourceId, newsData);
         this.mContext = context;
@@ -28,11 +31,18 @@ public class NewsAdapter extends ArrayAdapter {
         this.mNewsData = newsData;
     }
 
+    /**
+     * 外部传入接口
+     */
+    public void setOnItemDeleteListener(OnItemDeleteListener listener){
+        this.listener = listener;
+    }
+
     @NonNull
     @Override
-    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+    public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         News news = (News) getItem(position);
-        View view;
+        final View view;
         ViewHolder viewHolder;
         if (convertView == null) {      //判断缓冲池是否已经有view ,若有则可以直接用,不需要再继续反射
             view = LayoutInflater.from(getContext()).inflate(mResourceId, parent, false);
@@ -40,6 +50,7 @@ public class NewsAdapter extends ArrayAdapter {
             viewHolder.tvTitle = view.findViewById(R.id.tv_item_ex7_title);
             viewHolder.tvAuthor = view.findViewById(R.id.tv_item_ex7_author);
             viewHolder.imageView = view.findViewById(R.id.iv_item_ex7_image);
+            viewHolder.ivDelete = view.findViewById(R.id.iv_delete_ex7);
 
             view.setTag(viewHolder);
         } else {    //若缓冲池中已经有view则可以直接用holder对象
@@ -48,7 +59,16 @@ public class NewsAdapter extends ArrayAdapter {
         }
         viewHolder.tvTitle.setText(news.getTitle());
         viewHolder.tvAuthor.setText(news.getAuthor());
-        viewHolder.imageView.setImageBitmap(news.getImage());
+        viewHolder.imageView.setImageResource(news.getImageId());
+        viewHolder.ivDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //使用接口回调进行删除
+                if(listener != null){
+                    listener.onDelete(position);
+                }
+            }
+        });
         return view;
     }
 
@@ -57,5 +77,13 @@ public class NewsAdapter extends ArrayAdapter {
         TextView tvTitle;
         TextView tvAuthor;
         ImageView imageView;
+        ImageView ivDelete;
+    }
+
+    /**
+     * 点击删除接口
+     */
+    public interface OnItemDeleteListener{
+        void onDelete(int itemId);
     }
 }

@@ -1,5 +1,6 @@
 package com.chen.fy.experiment.ex_9;
 
+import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -9,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
@@ -36,7 +38,7 @@ public class NewsActivity extends AppCompatActivity implements LoaderManager.Loa
         listView.setAdapter(mCursorAdapter);
 
         //4 使用Loader在后台进行数据查询加载
-        getSupportLoaderManager().initLoader(0,null,this);
+        getSupportLoaderManager().initLoader(0, null, this);
     }
 
     @NonNull
@@ -52,5 +54,6 @@ public class NewsActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     @Override
-    public void onLoaderReset(@NonNull Loader<Cursor> loader) { }
+    public void onLoaderReset(@NonNull Loader<Cursor> loader) {
+    }
 }
