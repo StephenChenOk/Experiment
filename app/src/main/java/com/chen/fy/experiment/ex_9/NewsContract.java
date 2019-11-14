@@ -3,7 +3,7 @@ package com.chen.fy.experiment.ex_9;
 import android.provider.BaseColumns;
 
 /**
- * 合约类，包含News数据表的数据信息
+ * 合约类，向外暴露数据库的表结构
  */
 public final class NewsContract {
     //private 避免实例化该类
