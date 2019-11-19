@@ -8,6 +8,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 import android.provider.MediaStore;
@@ -17,6 +18,9 @@ import com.chen.fy.experiment.R;
 
 import java.io.IOException;
 
+/**
+ * 音乐播放后台服务类
+ */
 public class MusicService extends Service {
 
     private static final String CHANNEL_ID = "Music channel";
@@ -24,6 +28,8 @@ public class MusicService extends Service {
     private MediaPlayer mMediaPlayer;
 
     private NotificationManager mNotificationManager;
+
+    private final IBinder mBinder = new MusicServiceBinder();
 
     public MusicService() {
     }
@@ -100,7 +106,54 @@ public class MusicService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        // TODO: Return the communication channel to the service.
-        throw new UnsupportedOperationException("Not yet implemented");
+        return mBinder;
+    }
+
+    /**
+     * 暴露接口，让活动可以进行调用，实现歌曲的暂停播放等等操作
+     */
+    public void pause() {
+        if (mMediaPlayer != null && mMediaPlayer.isPlaying()) {
+            mMediaPlayer.pause();
+        }
+    }
+
+    public void play() {
+        if (mMediaPlayer != null) {
+            mMediaPlayer.start();
+        }
+    }
+
+    public int getDuration() {
+        int duration = 0;
+        if (mMediaPlayer != null) {
+            duration = mMediaPlayer.getDuration();
+        }
+        return duration;
+    }
+
+    public int getCurrentPosition() {
+        int currentPosintion = 0;
+        if (mMediaPlayer != null) {
+            currentPosintion = mMediaPlayer.getCurrentPosition();
+        }
+        return currentPosintion;
+    }
+    public boolean isPlaying() {
+        if (mMediaPlayer != null) {
+            return mMediaPlayer.isPlaying();
+        }
+        return false;
+    }
+
+    public class MusicServiceBinder extends Binder {
+
+        /**
+         * 暴露接口，获取Service实例
+         */
+        MusicService getService() {
+            return MusicService.this;
+        }
+
     }
 }

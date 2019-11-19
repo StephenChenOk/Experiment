@@ -1,15 +1,22 @@
 package com.chen.fy.experiment.ex_11;
 
 import android.Manifest;
+import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentUris;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Looper;
+import android.os.Message;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -24,6 +31,7 @@ import android.widget.AdapterView;
 import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,7 +44,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 主界面
+ * 音乐播放器主活动
  */
 public class MusicActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -44,6 +52,7 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
     private static final String TITLE = "com.chen.fy.title";
     private static final String ARTIST = "com.chen.fy.artist";
     private final int REQUEST_EXTERNAL_STORAGE = 1;
+    public static final int UPDATE_PROGRESS = 1;
 
     // ContentResolver.query ⽅法中的 selection 参数及 selectionArgs 参数
     private final String SELECTION =
@@ -64,10 +73,69 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
     private TextView tvArtist;
     private ImageView ivPlay;
 
+    private boolean mPlayerState = false;
+
     //播放器对象
     private MediaPlayer mMediaPlayer;
 
     private Cursor mCursor;
+
+    private MusicService mMusicService;
+    private boolean mBound = false;
+
+    private ServiceConnection mConn = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            MusicService.MusicServiceBinder binder = (MusicService.MusicServiceBinder) service;
+            mMusicService = binder.getService();
+            mBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mMusicService = null;
+            mBound = false;
+        }
+    };
+
+    private ProgressBar mProgressBar;
+    private Handler mHandler = new Handler(Looper.getMainLooper()) {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case UPDATE_PROGRESS:
+                    int position = msg.arg1;
+                    mProgressBar.setProgress(position);
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
+
+    private class MusicProgressRunnable implements Runnable{
+
+        @Override
+        public void run() {
+            boolean mThreadWorking = true;
+            while (mThreadWorking){
+                try {
+                    if(mMediaPlayer!=null){
+                        Message message = new Message();
+                        message.what = UPDATE_PROGRESS;
+                        message.arg1 = mMediaPlayer.getCurrentPosition();
+                        mHandler.sendMessage(message);
+                    }
+                    mThreadWorking = mMediaPlayer.isPlaying();
+                    Thread.sleep(100);
+                }catch (InterruptedException e){
+                    e.printStackTrace();
+
+
+                }
+            }
+        }
+    }
 
     /**
      * 歌曲Item的点击事件
@@ -97,7 +165,7 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
                         //2 获取到歌曲的Uri地址
                         Uri dataUri = Uri.parse(data);
 
-                        //使用服务在后天进行歌曲播放
+                        // 使用服务在后天进行歌曲播放
                         Intent serviceIntent = new Intent(MusicActivity.this,
                                 MusicService.class);
                         serviceIntent.putExtra(MusicActivity.DATA_URI, data);
@@ -106,16 +174,16 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
                         startService(serviceIntent);
 
                         //3 通过Uri进行歌曲播放
-//                        if (mMediaPlayer != null) {
-//                            try {
-//                                mMediaPlayer.reset();
-//                                mMediaPlayer.setDataSource(MusicActivity.this, dataUri);
-//                                mMediaPlayer.prepare();
-//                                mMediaPlayer.start();
-//                            } catch (IOException e) {
-//                                e.printStackTrace();
-//                            }
-//                        }
+                        if (mMediaPlayer != null) {
+                            try {
+                                mMediaPlayer.reset();
+                                mMediaPlayer.setDataSource(MusicActivity.this, dataUri);
+                                mMediaPlayer.prepare();
+                                mMediaPlayer.start();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
 
                         //4 更新歌曲控制栏
                         navigation.setVisibility(View.VISIBLE);
@@ -161,6 +229,8 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
         if (mMediaPlayer == null) {
             mMediaPlayer = new MediaPlayer();
         }
+        Intent intent = new Intent(MusicActivity.this, MusicService.class);
+        bindService(intent, mConn, Context.BIND_AUTO_CREATE);
     }
 
     @Override
@@ -171,6 +241,8 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
             mMediaPlayer.release();
             mMediaPlayer = null;
         }
+        unbindService(mConn);
+        mBound = false;
         super.onStop();
     }
 
@@ -263,6 +335,14 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.iv_play:
+                mPlayerState = !mPlayerState;
+                if (mPlayerState) {
+                    mMusicService.play();
+                    ivPlay.setImageResource(R.drawable.ic_pause_circle_outline_32dp);
+                } else {
+                    mMusicService.pause();
+                    ivPlay.setImageResource(R.drawable.ic_play_circle_outline_32dp);
+                }
                 break;
         }
     }
