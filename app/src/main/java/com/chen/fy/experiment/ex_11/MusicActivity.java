@@ -1,11 +1,13 @@
 package com.chen.fy.experiment.ex_11;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -53,6 +55,8 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
     private static final String ARTIST = "com.chen.fy.artist";
     private final int REQUEST_EXTERNAL_STORAGE = 1;
     public static final int UPDATE_PROGRESS = 1;
+    public static final String ACTION_MUSIC_START = "com.chen.fy.action_music_start";
+    public static final String ACTION_MUSIC_STOP = "com.chen.fy.action_music_stop";
 
     // ContentResolver.query ⽅法中的 selection 参数及 selectionArgs 参数
     private final String SELECTION =
@@ -82,6 +86,8 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
 
     private MusicService mMusicService;
     private boolean mBound = false;
+
+    private MusicReceiver mMusicReceiver;
 
     private ServiceConnection mConn = new ServiceConnection() {
         @Override
@@ -113,14 +119,14 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
         }
     };
 
-    private class MusicProgressRunnable implements Runnable{
+    private class MusicProgressRunnable implements Runnable {
 
         @Override
         public void run() {
             boolean mThreadWorking = true;
-            while (mThreadWorking){
+            while (mThreadWorking) {
                 try {
-                    if(mMediaPlayer!=null){
+                    if (mMediaPlayer != null) {
                         Message message = new Message();
                         message.what = UPDATE_PROGRESS;
                         message.arg1 = mMediaPlayer.getCurrentPosition();
@@ -128,11 +134,24 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
                     }
                     mThreadWorking = mMediaPlayer.isPlaying();
                     Thread.sleep(100);
-                }catch (InterruptedException e){
+                } catch (InterruptedException e) {
                     e.printStackTrace();
 
-
                 }
+            }
+        }
+    }
+
+    /**
+     * 定义一个广播，实现当音乐开始播放时会发送广播以开启子线程随时监听并更新歌曲进度条
+     */
+    private class MusicReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (mMusicService != null) {
+                mProgressBar.setMax(mMusicService.getDuration());
+                new Thread(new MusicProgressRunnable()).start();
             }
         }
     }
@@ -220,6 +239,7 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
 
         initView();
         initMusicList();
+        initReceiver();
     }
 
     @Override
@@ -244,6 +264,12 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
         unbindService(mConn);
         mBound = false;
         super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        unregisterReceiver(mMusicReceiver);
+        super.onDestroy();
     }
 
     private void initView() {
@@ -287,6 +313,18 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
         mCursorAdapter.swapCursor(mCursor);
         mCursorAdapter.notifyDataSetChanged();
     }
+
+    /**
+     * 广播初始化
+     */
+    private void initReceiver() {
+        mMusicReceiver = new MusicReceiver();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(ACTION_MUSIC_START);
+        intentFilter.addAction(ACTION_MUSIC_STOP);
+        registerReceiver(mMusicReceiver, intentFilter);
+    }
+
 
     /**
      * 动态申请危险权限

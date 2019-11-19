@@ -60,6 +60,10 @@ public class MusicService extends Service {
                 mMediaPlayer.setDataSource(getApplicationContext(), dataUri);
                 mMediaPlayer.prepare();
                 mMediaPlayer.start();
+
+                Intent intent1 = new Intent(MusicActivity.ACTION_MUSIC_START);
+                sendBroadcast(intent1);
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -139,6 +143,7 @@ public class MusicService extends Service {
         }
         return currentPosintion;
     }
+
     public boolean isPlaying() {
         if (mMediaPlayer != null) {
             return mMediaPlayer.isPlaying();
