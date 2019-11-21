@@ -11,8 +11,8 @@ import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
-import android.provider.MediaStore;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 import com.chen.fy.experiment.R;
 
@@ -48,60 +48,12 @@ public class MusicService extends Service {
      */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
-        String data = intent.getStringExtra(MusicActivity.DATA_URI);
-        String title = intent.getStringExtra(MusicActivity.DATA_URI);
-        String artist = intent.getStringExtra(MusicActivity.DATA_URI);
-
-        Uri dataUri = Uri.parse(data);
-        if (mMediaPlayer != null) {
-            try {
-                mMediaPlayer.reset();
-                mMediaPlayer.setDataSource(getApplicationContext(), dataUri);
-                mMediaPlayer.prepare();
-                mMediaPlayer.start();
-
-                Intent intent1 = new Intent(MusicActivity.ACTION_MUSIC_START);
-                sendBroadcast(intent1);
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        //创建通知管道
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-            NotificationChannel notificationChannel = new NotificationChannel(
-                    CHANNEL_ID, "Music Channel", NotificationManager.IMPORTANCE_HIGH);
-            if (mNotificationManager != null) {
-                mNotificationManager.createNotificationChannel(notificationChannel);
-            }
-        }
-
-        //延迟意图，点击通知后跳转列表界面
-        Intent notificationIntent = new Intent(getApplicationContext(), MusicActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(
-                getApplicationContext(), 0, notificationIntent, 0);
-
-        NotificationCompat.Builder builder =
-                new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID);
-
-        //通知设置
-        Notification notification = builder
-                .setContentTitle(title)
-                .setContentText(artist)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setContentIntent(pendingIntent).build();
-
-        //开启前台服务
-        startForeground(NOTIFICATION_ID, notification);
-
         return super.onStartCommand(intent, flags, startId);
     }
 
     @Override
     public void onDestroy() {
+        Log.d("chenyisheng", "Service---onDestroy");
         mMediaPlayer.stop();
         mMediaPlayer.release();
         mMediaPlayer = null;
@@ -111,6 +63,62 @@ public class MusicService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         return mBinder;
+    }
+
+    /**
+     * 点击歌曲Item后执行，对歌曲进行播放并显示通知
+     *
+     * @param data      歌曲地址
+     * @param title     歌曲名
+     * @param artist    歌手名
+     */
+    public void prepareMusic(String data, String title, String artist) {
+        //1 解析歌曲地址，并准备歌曲进行播放
+        Uri dataUri = Uri.parse(data);
+        if (mMediaPlayer != null) {
+            try {
+                mMediaPlayer.reset();
+                mMediaPlayer.setDataSource(getApplicationContext(), dataUri);
+                mMediaPlayer.prepare();
+                mMediaPlayer.start();
+
+                //发送广播，开启子线程对进度条进行更新
+                Intent intent1 = new Intent(MusicActivity.ACTION_MUSIC_START);
+                sendBroadcast(intent1);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        //2 创建通知管道
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            NotificationChannel notificationChannel = new NotificationChannel(
+                    CHANNEL_ID, "Music Channel", NotificationManager.IMPORTANCE_HIGH);
+            if (mNotificationManager != null) {
+                mNotificationManager.createNotificationChannel(notificationChannel);
+            }
+        }
+
+        //3 创建延迟意图，点击通知后跳转列表界面
+        Intent notificationIntent = new Intent(getApplicationContext(), MusicActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(
+                getApplicationContext(), 0, notificationIntent, 0);
+
+        NotificationCompat.Builder builder =
+                new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID);
+
+        //4 设置通知信息
+        Notification notification = builder
+                .setContentTitle(title)
+                .setContentText(artist)
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setContentIntent(pendingIntent).build();
+
+        //5 开启前台服务
+        startForeground(NOTIFICATION_ID, notification);
+
     }
 
     /**
@@ -151,7 +159,8 @@ public class MusicService extends Service {
         return false;
     }
 
-    public class MusicServiceBinder extends Binder {
+
+    class MusicServiceBinder extends Binder {
 
         /**
          * 暴露接口，获取Service实例

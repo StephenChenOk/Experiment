@@ -20,6 +20,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.provider.MediaStore;
+import android.support.annotation.LongDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
@@ -27,6 +28,7 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -54,7 +56,7 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
     private static final String TITLE = "com.chen.fy.title";
     private static final String ARTIST = "com.chen.fy.artist";
     private final int REQUEST_EXTERNAL_STORAGE = 1;
-    public static final int UPDATE_PROGRESS = 1;
+    public static final int UPDATE_PROGRESS = 11;
     public static final String ACTION_MUSIC_START = "com.chen.fy.action_music_start";
     public static final String ACTION_MUSIC_STOP = "com.chen.fy.action_music_stop";
 
@@ -72,6 +74,7 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
     private CursorAdapter mCursorAdapter;
 
     private BottomNavigationView navigation;
+    private ProgressBar mProgressBar;
     private ImageView ivThumbnail;
     private TextView tvTitle;
     private TextView tvArtist;
@@ -79,12 +82,10 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
 
     private boolean mPlayerState = false;
 
-    //播放器对象
-    private MediaPlayer mMediaPlayer;
-
     private Cursor mCursor;
 
     private MusicService mMusicService;
+    //服务是否已经与活动进行了绑定
     private boolean mBound = false;
 
     private MusicReceiver mMusicReceiver;
@@ -97,6 +98,9 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
             mBound = true;
         }
 
+        /**
+         * 在连接正常关闭时不会调用，只有在Service在被异常地破坏了或者杀死后才会调用此放啊
+         */
         @Override
         public void onServiceDisconnected(ComponentName name) {
             mMusicService = null;
@@ -104,7 +108,10 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
         }
     };
 
-    private ProgressBar mProgressBar;
+    /**
+     * 进度条更新Handler
+     * 当在子线程中监听到进度条发生改变时，发送消息给此Handler进行UI更新
+     */
     private Handler mHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(Message msg) {
@@ -119,6 +126,9 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
         }
     };
 
+    /**
+     * 开启一个子线程时刻监听歌曲播放情况，并随时更新进度条
+     */
     private class MusicProgressRunnable implements Runnable {
 
         @Override
@@ -126,13 +136,13 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
             boolean mThreadWorking = true;
             while (mThreadWorking) {
                 try {
-                    if (mMediaPlayer != null) {
+                    if (mMusicService != null) {
                         Message message = new Message();
                         message.what = UPDATE_PROGRESS;
-                        message.arg1 = mMediaPlayer.getCurrentPosition();
+                        message.arg1 = mMusicService.getCurrentPosition();
                         mHandler.sendMessage(message);
                     }
-                    mThreadWorking = mMediaPlayer.isPlaying();
+                    mThreadWorking = mMusicService.isPlaying();
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -143,7 +153,10 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
     }
 
     /**
-     * 定义一个广播，实现当音乐开始播放时会发送广播以开启子线程随时监听并更新歌曲进度条
+     * 1 定义一个广播，实现当音乐开始播放时会发送广播以开启子线程随时监听并更新歌曲进度条
+     * 2 之所以要使用广播进行进度条的更新，是因为进度条更新需要在子线程中进行，所以无法控制当开始读取进度
+     *   条时歌曲是否已经准备好并已经开始播放，所以使用广播当歌曲开始播放时发送广播，这边接收到后开始
+     *   更新进度条，避免了空指针的可能性出现
      */
     private class MusicReceiver extends BroadcastReceiver {
 
@@ -176,32 +189,13 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
                         int dataIndex = cursor.getColumnIndex(
                                 MediaStore.Audio.Media.DATA); //Uri路径
 
+                        String data = cursor.getString(dataIndex);
                         String title = cursor.getString(titleIndex);
                         String artist = cursor.getString(artistIndex);
                         long albumId = cursor.getLong(albumIdIndex);
-                        String data = cursor.getString(dataIndex);
 
-                        //2 获取到歌曲的Uri地址
-                        Uri dataUri = Uri.parse(data);
-
-                        // 使用服务在后天进行歌曲播放
-                        Intent serviceIntent = new Intent(MusicActivity.this,
-                                MusicService.class);
-                        serviceIntent.putExtra(MusicActivity.DATA_URI, data);
-                        serviceIntent.putExtra(MusicActivity.TITLE, title);
-                        serviceIntent.putExtra(MusicActivity.ARTIST, artist);
-                        startService(serviceIntent);
-
-                        //3 通过Uri进行歌曲播放
-                        if (mMediaPlayer != null) {
-                            try {
-                                mMediaPlayer.reset();
-                                mMediaPlayer.setDataSource(MusicActivity.this, dataUri);
-                                mMediaPlayer.prepare();
-                                mMediaPlayer.start();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
+                        if (mMusicService != null) {
+                            mMusicService.prepareMusic(data, title, artist);
                         }
 
                         //4 更新歌曲控制栏
@@ -246,28 +240,19 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
     protected void onStart() {
         super.onStart();
         //创建播放器对象
-        if (mMediaPlayer == null) {
-            mMediaPlayer = new MediaPlayer();
-        }
         Intent intent = new Intent(MusicActivity.this, MusicService.class);
         bindService(intent, mConn, Context.BIND_AUTO_CREATE);
     }
 
     @Override
     protected void onStop() {
-        //释放播放器对象
-        if (mMediaPlayer != null) {
-            mMediaPlayer.stop();
-            mMediaPlayer.release();
-            mMediaPlayer = null;
-        }
-        unbindService(mConn);
-        mBound = false;
         super.onStop();
     }
 
     @Override
     protected void onDestroy() {
+        unbindService(mConn);
+        mBound = false;
         unregisterReceiver(mMusicReceiver);
         super.onDestroy();
     }
@@ -285,6 +270,7 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
         LayoutInflater.from(this).inflate(R.layout.music_navigation_layout, navigation, true);
 
         //获取控制栏中的控件对象
+        mProgressBar = navigation.findViewById(R.id.pb_navigation);
         ivThumbnail = navigation.findViewById(R.id.iv_thumbnail);
         tvTitle = navigation.findViewById(R.id.tv_bottom_title);
         tvArtist = navigation.findViewById(R.id.tv_bottom_artist);
@@ -320,8 +306,10 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
     private void initReceiver() {
         mMusicReceiver = new MusicReceiver();
         IntentFilter intentFilter = new IntentFilter();
+        //增加广播过滤器
         intentFilter.addAction(ACTION_MUSIC_START);
         intentFilter.addAction(ACTION_MUSIC_STOP);
+        //注册广播
         registerReceiver(mMusicReceiver, intentFilter);
     }
 
