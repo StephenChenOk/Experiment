@@ -53,7 +53,6 @@ public class MusicService extends Service {
 
     @Override
     public void onDestroy() {
-        Log.d("chenyisheng", "Service---onDestroy");
         mMediaPlayer.stop();
         mMediaPlayer.release();
         mMediaPlayer = null;
@@ -160,6 +159,9 @@ public class MusicService extends Service {
     }
 
 
+    /**
+     * 服务内部的Binder类，绑定服务后此Binder类对象就可以获取到当前服务的对象
+     */
     class MusicServiceBinder extends Binder {
 
         /**

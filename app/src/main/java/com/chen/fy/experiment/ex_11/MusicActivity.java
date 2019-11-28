@@ -90,6 +90,9 @@ public class MusicActivity extends AppCompatActivity implements View.OnClickList
 
     private MusicReceiver mMusicReceiver;
 
+    /**
+     * 绑定服务时建立连接的类，可以在其重写的方法中获得服务的实例
+     */
     private ServiceConnection mConn = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
