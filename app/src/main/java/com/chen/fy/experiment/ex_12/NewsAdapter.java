@@ -13,9 +13,6 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.chen.fy.experiment.R;
 
-import org.w3c.dom.Text;
-
-import java.util.Arrays;
 import java.util.List;
 
 public class NewsAdapter extends ArrayAdapter {
@@ -24,21 +21,11 @@ public class NewsAdapter extends ArrayAdapter {
     private int mResourceId;
     private List<News> mNewsData;
 
-    private com.chen.fy.experiment.ex_7.NewsAdapter.OnItemDeleteListener listener = null;
-
-
     public NewsAdapter(@NonNull Context context, int resourceId, @NonNull List<News> newsData) {
         super(context, resourceId, newsData);
         this.mContext = context;
         this.mResourceId = resourceId;
         this.mNewsData = newsData;
-    }
-
-    /**
-     * 外部传入接口
-     */
-    public void setOnItemDeleteListener(com.chen.fy.experiment.ex_7.NewsAdapter.OnItemDeleteListener listener) {
-        this.listener = listener;
     }
 
     @NonNull
@@ -77,12 +64,5 @@ public class NewsAdapter extends ArrayAdapter {
         ImageView ivImage;
         ImageView ivDelete;
         TextView tvPublishTime;
-    }
-
-    /**
-     * 点击删除接口
-     */
-    public interface OnItemDeleteListener {
-        void onDelete(int itemId);
     }
 }
